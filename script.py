@@ -3,15 +3,11 @@ import time
 
 from playwright.sync_api import sync_playwright
 
-# AUTO_USER = os.getenv("AUTO_USER")
-# AUTO_PASS = os.getenv("AUTO_PASS")
-# GIDAS_USER = os.getenv("GIDAS_USER")
-# GIDAS_PASS = os.getenv("GIDAS_PASS")
+AUTO_USER = os.getenv("AUTO_USER")
+AUTO_PASS = os.getenv("AUTO_PASS")
+GIDAS_USER = os.getenv("GIDAS_USER")
+GIDAS_PASS = os.getenv("GIDAS_PASS")
 
-AUTO_USER = '+37060403272'
-AUTO_PASS = 'LordNelson1'
-GIDAS_USER = 'rimti.senelyzai@gmail.com'
-GIDAS_PASS = 'LordNelson1'
 
 def run():
     with sync_playwright() as p:
