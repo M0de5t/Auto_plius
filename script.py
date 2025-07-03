@@ -8,6 +8,7 @@ AUTO_PASS = os.getenv("AUTO_PASS")
 GIDAS_USER = os.getenv("GIDAS_USER")
 GIDAS_PASS = os.getenv("GIDAS_PASS")
 
+
 def run():
     with sync_playwright() as p:
         browser = p.chromium.launch(
@@ -28,7 +29,7 @@ def run():
 
         # 1. AUTOPLIUS
         page.goto("https://autoplius.lt", timeout=5000)
-        page.click('button[aria-label="Sutinku"]', timeout=5000)
+        # page.click('button[aria-label="Sutinku"]', timeout=5000)
 
         page.click('a[title="Prisijungti"]', timeout=10000)
         page.fill('#username-lookup', AUTO_USER, timeout=5000)
@@ -52,10 +53,10 @@ def run():
         time.sleep(2)
         page.click('input[type="submit"][value="Prisijungti"]', timeout=5000)
         time.sleep(2)
-        page.wait_for_selector("#renew-advertisements-button", timeout=10000)
-        time.sleep(2)
-        page.click("#renew-advertisements-button", timeout=5000)
-        time.sleep(2)
+        # page.wait_for_selector("#renew-advertisements-button", timeout=10000)
+        # time.sleep(2)
+        # page.click("#renew-advertisements-button", timeout=5000)
+        # time.sleep(2)
         page.goto("https://autogidas.lt/ajax/ad/renew-all/proceed?category_id=10", timeout=5000)
         time.sleep(2)
 
