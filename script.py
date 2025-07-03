@@ -3,11 +3,15 @@ import time
 
 from playwright.sync_api import sync_playwright
 
-AUTO_USER = os.getenv("AUTO_USER")
-AUTO_PASS = os.getenv("AUTO_PASS")
-GIDAS_USER = os.getenv("GIDAS_USER")
-GIDAS_PASS = os.getenv("GIDAS_PASS")
+# AUTO_USER = os.getenv("AUTO_USER")
+# AUTO_PASS = os.getenv("AUTO_PASS")
+# GIDAS_USER = os.getenv("GIDAS_USER")
+# GIDAS_PASS = os.getenv("GIDAS_PASS")
 
+AUTO_USER = '+37060403272'
+AUTO_PASS = 'LordNelson1'
+GIDAS_USER = 'rimti.senelyzai@gmail.com'
+GIDAS_PASS = 'LordNelson1'
 
 def run():
     with sync_playwright() as p:
@@ -36,13 +40,13 @@ def run():
         page.click('button:has-text("Tęsti")', timeout=5000)
         page.fill('#password', AUTO_PASS, timeout=5000)
         page.click('button:has-text("Prisijungti")', timeout=5000)
-
         page.wait_for_selector('a[title="Mano Autoplius.lt"]', timeout=10000)
         page.goto("https://autoplius.lt/dashboard/announcements/autodalys/lengvuju-dalys", timeout=5000)
 
         page.click('div.js-renew-announcements-old:has-text("Atnaujinti visus")', timeout=10000)
 
         # 2. AUTOGIDAS
+        time.sleep(2)
         page.goto("https://autogidas.lt/mano-gidas/", timeout=30000)
         time.sleep(2)
         page.click("#onetrust-accept-btn-handler", timeout=5000)
