@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "start": "python script.py"
+  },
+  "jobs": [
+    {
+      "name": "Renew every 1.5 hours",
+      "schedule": "*/90 * * * *",
+      "command": "python script.py"
+    }
+  ]
+}
