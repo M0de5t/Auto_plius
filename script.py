@@ -1,96 +1,68 @@
-# user_autoplius = +37060403272
-# user_pass_autoplius = 'LordNelson1'
-#
-# user_autogidas = 'rimti.senelyzai@gmail.com'
-# user_pass_autogidas = 'LordNelson1'
-
-
-
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import undetected_chromedriver as uc
-
-options = uc.ChromeOptions()
-options.add_argument("--no-sandbox")
-options.add_argument("--disable-blink-features=AutomationControlled")
-
-driver = uc.Chrome(options=options)
-
 import os
+import time
 
-user_autoplius = os.getenv("AUTO_USER")
-user_pass_autoplius = os.getenv("AUTO_PASS")
+from playwright.sync_api import sync_playwright
 
-user_autogidas = os.getenv("GIDAS_USER")
-user_pass_autogidas = os.getenv("GIDAS_PASS")
-wait = WebDriverWait(driver, 10)
-# autopliusas
-driver.get("https://autoplius.lt")
+AUTO_USER = os.getenv("AUTO_USER")
+AUTO_PASS = os.getenv("AUTO_PASS")
+GIDAS_USER = os.getenv("GIDAS_USER")
+GIDAS_PASS = os.getenv("GIDAS_PASS")
 
-consent_button = wait.until(
-    EC.element_to_be_clickable((By.XPATH, '//button[@aria-label="Sutinku"]'))
-)
-consent_button.click()
+def run():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(
+            headless=True,
+            args=["--disable-blink-features=AutomationControlled"] 
+        )
+        context = browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+            locale="lt-LT",
+            extra_http_headers={
+                "Referer": "https://autogidas.lt/",
+                "Accept-Language": "lt-LT,lt;q=0.9,en-US;q=0.8,en;q=0.7"
+            }
+        )
+        context.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
-login_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//a[@title="Prisijungti"]')))
-login_button.click()
+        page = context.new_page()
 
-username_input = wait.until(EC.visibility_of_element_located((By.ID, "username-lookup")))
-username_input.send_keys(f"{user_autoplius}")
+        # 1. AUTOPLIUS
+        page.goto("https://autoplius.lt", timeout=5000)
+        page.click('button[aria-label="Sutinku"]', timeout=5000)
 
-continue_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[normalize-space()="Tęsti"]')))
-continue_button.click()
+        page.click('a[title="Prisijungti"]', timeout=10000)
+        page.fill('#username-lookup', AUTO_USER, timeout=5000)
+        page.click('button:has-text("Tęsti")', timeout=5000)
+        page.fill('#password', AUTO_PASS, timeout=5000)
+        page.click('button:has-text("Prisijungti")', timeout=5000)
 
-pass_input = wait.until(EC.visibility_of_element_located((By.ID, "password")))
-pass_input.send_keys(f"{user_pass_autoplius}")
+        page.wait_for_selector('a[title="Mano Autoplius.lt"]', timeout=10000)
+        page.goto("https://autoplius.lt/dashboard/announcements/autodalys/lengvuju-dalys", timeout=5000)
 
-continue_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[normalize-space()="Prisijungti"]')))
-continue_button.click()
+        page.click('div.js-renew-announcements-old:has-text("Atnaujinti visus")', timeout=10000)
 
-# dummy wait
-my_account_link = wait.until(
-    EC.visibility_of_element_located(
-        (By.XPATH, '//a[@title="Mano Autoplius.lt" and contains(@href, "/dashboard/announcements")]')
-    )
-)
+        # 2. AUTOGIDAS
+        page.goto("https://autogidas.lt/mano-gidas/", timeout=30000)
+        time.sleep(2)
+        page.click("#onetrust-accept-btn-handler", timeout=5000)
+        time.sleep(2)
+        page.fill("#vartotojovardas", GIDAS_USER, timeout=5000)
+        time.sleep(2)
+        page.fill("#vartotojoslaptazodis", GIDAS_PASS)
+        time.sleep(2)
+        page.click('input[type="submit"][value="Prisijungti"]', timeout=5000)
+        time.sleep(2)
+        page.wait_for_selector("#renew-advertisements-button", timeout=10000)
+        time.sleep(2)
+        page.click("#renew-advertisements-button", timeout=5000)
+        time.sleep(2)
+        page.goto("https://autogidas.lt/ajax/ad/renew-all/proceed?category_id=10", timeout=5000)
+        time.sleep(2)
 
-driver.get("https://autoplius.lt/dashboard/announcements/autodalys/lengvuju-dalys")
+        print("✅ Ads renewed successfully.")
 
-renew_button = wait.until(EC.element_to_be_clickable(
-    (By.XPATH, '//div[contains(@class, "js-renew-announcements-old") and contains(text(), "Atnaujinti visus")]')
-))
-renew_button.click()
+        context.close()
+        browser.close()
 
-# autogidas
-driver.get('https://autogidas.lt/mano-gidas/')
-
-accept_button = wait.until(
-    EC.element_to_be_clickable((By.ID, "onetrust-accept-btn-handler"))
-)
-accept_button.click()
-
-user_gidas_input = wait.until(
-    EC.visibility_of_element_located((By.ID, "vartotojovardas"))
-)
-user_gidas_input.send_keys(f"{user_autogidas}")
-
-password_gidas_input = wait.until(
-    EC.visibility_of_element_located((By.ID, "vartotojoslaptazodis"))
-)
-password_gidas_input.send_keys(f"{user_pass_autogidas}")
-
-login_button = wait.until(
-    EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[type="submit"][value="Prisijungti"]'))
-)
-login_button.click()
-
-renew_button = wait.until(
-    EC.element_to_be_clickable((By.ID, "renew-advertisements-button"))
-)
-renew_button.click()
-
-renew_link = wait.until(
-    EC.element_to_be_clickable((By.XPATH, '//a[@title="Atnaujinti" and contains(@href, "renew-all/proceed")]'))
-)
-driver.get('https://autogidas.lt/ajax/ad/renew-all/proceed?category_id=10')
+if __name__ == "__main__":
+    run()
